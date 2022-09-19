@@ -41,10 +41,10 @@ googleProvider.setCustomParameters({
 });
 
 export const auth = getAuth();
-export const singInWithGooglePopup = () => {
+export const signInWithGooglePopup = () => {
   return signInWithPopup(auth, googleProvider);
 };
-export const singInWithGoogleRedirect = () =>
+export const signInWithGoogleRedirect = () =>
   signInWithRedirect(auth, googleProvider);
 
 export const db = getFirestore();
@@ -65,20 +65,28 @@ export const addCollectionsAndDocuments = async (
   console.log("done");
 };
 
+// export const getCollectionsAndDocuments = async () => {
+//   const collectionRef = collection(db, "categories");
+//   const q = query(collectionRef);
+
+//   const querySnapshot = await getDocs(q);
+
+//   return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
+//   const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
+//     const { title, items } = docSnapshot.data();
+//     acc[title.toLowerCase()] = items;
+//     return acc;
+//   }, {});
+
+//   return categoryMap;
+// };
+
 export const getCollectionsAndDocuments = async () => {
   const collectionRef = collection(db, "categories");
   const q = query(collectionRef);
 
   const querySnapshot = await getDocs(q);
-
   return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
-  // const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
-  //   const { title, items } = docSnapshot.data();
-  //   acc[title.toLowerCase()] = items;
-  //   return acc;
-  // }, {});
-
-  // return categoryMap;
 };
 
 export const createUserDocumentFromAuth = async (
@@ -105,7 +113,7 @@ export const createUserDocumentFromAuth = async (
     }
   }
 
-  return userDocRef;
+  return userSnapShot;
 };
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
@@ -122,3 +130,16 @@ export const signOutUser = async () => await signOut(auth);
 
 export const onAuthStateChangedListener = (callback) =>
   onAuthStateChanged(auth, callback);
+
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (userAuth) => {
+        unsubscribe();
+        resolve(userAuth);
+      },
+      reject
+    );
+  });
+};
